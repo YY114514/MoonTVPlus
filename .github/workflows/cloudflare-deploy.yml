@@ -148,7 +148,7 @@ jobs:
         run: pnpm run build:cloudflare
 
       - name: Install Wrangler
-        run: pnpm add -g wrangler@4.60.0
+        run: pnpm add -g wrangler@4.115.0
 
       - name: Run D1 Database Migrations
         run: |
