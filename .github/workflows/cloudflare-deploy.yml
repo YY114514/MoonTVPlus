@@ -44,6 +44,15 @@ jobs:
       # 【关键 2】在部署前插入短暂延迟，避免 Cloudflare API 触发 429 限流
       - name: Wait to avoid rate limits
         run: sleep 30
+        
+      - name: Verify Cloudflare API Token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+
 
       # 【可选】D1 迁移（API Token 需具备 Account → D1 → Edit 权限）
       - name: Apply D1 migrations
