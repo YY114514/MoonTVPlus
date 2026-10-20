@@ -185,4 +185,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
           packageManager: pnpm
-          wranglerVersion: "4.60.0"
+          wranglerVersion: "4.115.0"
