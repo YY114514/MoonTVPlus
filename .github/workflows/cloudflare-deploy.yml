@@ -109,19 +109,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          if grep -R -n \
-            --exclude-dir=.git \
-            --exclude-dir=node_modules \
-            --exclude-dir=.next \
-            --exclude-dir=.open-next \
-            --exclude-dir=.wrangler \
-            --exclude='pnpm-lock.yaml' \
-            '194028a2-1d3a-46a9-a00e-a3a56ff991af' .; then
-            echo "::error::Replace the D1 database ID placeholder with your actual database UUID."
+          CONFIG="wrangler.toml"
+
+          if [[ ! -f "$CONFIG" ]]; then
+            echo "::error::wrangler.toml was not found."
             exit 1
           fi
 
-          echo "No D1 database ID placeholder found."
+          if grep -nF 'REPLACE_WITH_YOUR_D1_DATABASE_ID' "$CONFIG"; then
+            echo "::error::Replace the D1 database ID in wrangler.toml with the real ID."
+            exit 1
+          fi
+
+          if ! grep -Eq \
+            '^[[:space:]]*database_id[[:space:]]*=[[:space:]]*"[a-fA-F0-9]{32}"[[:space:]]*$' \
+            "$CONFIG"; then
+            echo "::error::wrangler.toml does not contain a valid 32-character database_id."
+            exit 1
+          fi
+
+          echo "D1 database ID configuration looks valid."
 
       # 8. 构建 OpenNext Cloudflare 项目
       - name: Build OpenNext project
