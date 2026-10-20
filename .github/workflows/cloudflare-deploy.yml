@@ -116,7 +116,7 @@ jobs:
             --exclude-dir=.open-next \
             --exclude-dir=.wrangler \
             --exclude='pnpm-lock.yaml' \
-            'REPLACE_WITH_YOUR_D1_DATABASE_ID' .; then
+            '194028a2-1d3a-46a9-a00e-a3a56ff991af' .; then
             echo "::error::Replace the D1 database ID placeholder with your actual database UUID."
             exit 1
           fi
