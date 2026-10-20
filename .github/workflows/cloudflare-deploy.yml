@@ -20,10 +20,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      # 【关键修正】不再指定 version，由 Action 自动读取 package.json 中的 packageManager
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,13 +35,9 @@ jobs:
 
       - name: Set environment variables
         run: |
-          # 将部署所需的变量注入到后续步骤中
           echo "CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" >> $GITHUB_ENV
-          # 如果你的 Next.js 构建阶段需要其他变量，请在这里追加，例如：
-          # echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> $GITHUB_ENV
 
       # 【关键 1】使用 OpenNext Cloudflare 专用构建命令
-      # 生成 .open-next 编译产物，否则 deploy 阶段会报 "Could not find compiled Open Next config"
       - name: Build OpenNext project
         run: pnpm opennextjs-cloudflare build
 
@@ -50,8 +45,7 @@ jobs:
       - name: Wait to avoid rate limits
         run: sleep 30
 
-      # 【可选】如果项目需要自动执行 D1 迁移，可启用以下步骤
-      # 注意：API Token 必须具备 Account → D1 → Edit 权限
+      # 【可选】D1 迁移（API Token 需具备 Account → D1 → Edit 权限）
       - name: Apply D1 migrations
         uses: cloudflare/wrangler-action@v3
         with:
@@ -61,7 +55,6 @@ jobs:
           command: d1 migrations apply moontvplus --remote
 
       # 【关键 3】部署到 Cloudflare Workers
-      # 使用 4.115.0+ 版本，Wrangler 会自动重试 429 错误
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
