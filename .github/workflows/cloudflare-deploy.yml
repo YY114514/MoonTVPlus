@@ -104,6 +104,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # 7. 检查 D1 数据库 ID 占位符
+      
       - name: Check D1 configuration
         shell: bash
         run: |
@@ -116,19 +117,20 @@ jobs:
             exit 1
           fi
 
-          if grep -nF 'REPLACE_WITH_YOUR_D1_DATABASE_ID' "$CONFIG"; then
-            echo "::error::Replace the D1 database ID in wrangler.toml with the real ID."
+          if grep -qF 'REPLACE_WITH_YOUR_D1_DATABASE_ID' "$CONFIG"; then
+            echo "::error::D1 database ID is still a placeholder."
             exit 1
           fi
 
           if ! grep -Eq \
-            '^[[:space:]]*database_id[[:space:]]*=[[:space:]]*"[a-fA-F0-9]{32}"[[:space:]]*$' \
+            '^[[:space:]]*database_id[[:space:]]*=[[:space:]]*"([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}|[a-fA-F0-9]{32})"[[:space:]]*$' \
             "$CONFIG"; then
-            echo "::error::wrangler.toml does not contain a valid 32-character database_id."
+            echo "::error::Invalid D1 database_id format in wrangler.toml."
+            echo "Expected a UUID, usually in 8-4-4-4-12 format."
             exit 1
           fi
 
-          echo "D1 database ID configuration looks valid."
+          echo "D1 database ID format check passed."
 
       # 8. 构建 OpenNext Cloudflare 项目
       - name: Build OpenNext project
