@@ -14,7 +14,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "moontvplus"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "194028a2-1d3a-46a9-a00e-a3a56ff991af"
 
 [vars]
 NODE_ENV = "production"
